@@ -17,7 +17,7 @@ public class Launcher2 : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         RoomOptions options = new RoomOptions();
-        options.MaxPlayers = 1;
+        options.MaxPlayers = 4;
 
         PhotonNetwork.JoinOrCreateRoom("ServerFullAuth", options, TypedLobby.Default);
     }

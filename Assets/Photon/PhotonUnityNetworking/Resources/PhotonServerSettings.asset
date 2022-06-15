@@ -66,6 +66,9 @@ MonoBehaviour:
   - RPC_DrawAction
   - RPC_EndDrawAction
   - SetLocalParms
+  - SetPosition
+  - SetNewPosition
+  - SetStartingPosition
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

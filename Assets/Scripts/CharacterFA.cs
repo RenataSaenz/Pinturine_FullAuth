@@ -9,8 +9,8 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
 { 
     Player _owner;
     public Brush brush;
-    [SerializeField] private List<GameObject> _drawMade = new List<GameObject>();
-    private LineRenderer currentLineRenderer;
+    [SerializeField] private List<Brush> _brushMade = new List<Brush>();
+    public LineRenderer currentLineRenderer;
     
     public CharacterFA SetInitialParameters(Player player)
     {
@@ -61,18 +61,24 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
 
     public void CreateBrush(Vector2 startPos, Vector2 endPos)
     {
-        var brushInstance = PhotonNetwork.Instantiate(brush.name, brush.transform.position, brush.transform.rotation);
-        _drawMade.Add(brushInstance);
-        currentLineRenderer = brushInstance.GetComponent<LineRenderer>();
+        var brushInstance = PhotonNetwork.Instantiate(brush.name, transform.position, transform.rotation)
+            .GetComponent<Brush>()
+            .SetOwner(this)
+            .SetStartingPosition(startPos);
+        _brushMade.Add(brushInstance);
+        currentLineRenderer = brushInstance.lineRenderer;
+        if (currentLineRenderer == null)Debug.Log("currentLineRenderer is null");
       
-        currentLineRenderer.SetPosition(0, startPos);
-        currentLineRenderer.SetPosition(1, endPos);
+        // currentLineRenderer.SetPosition(0, startPos);
+        // currentLineRenderer.SetPosition(1, endPos);
     }
 
     public void DrawAction(Vector2  pointPos)
     {
+        Debug.Log("draw action");
         currentLineRenderer.positionCount++;
         int positionIndex = currentLineRenderer.positionCount - 1;
+        Debug.Log(pointPos);
         currentLineRenderer.SetPosition(positionIndex, pointPos);
     }
     
@@ -82,11 +88,11 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
     }
     public void ClearDraw()
     {
-        foreach (var d in _drawMade)
+        foreach (var d in _brushMade)
         {
             Destroy(d.gameObject);
         }
-        _drawMade.Clear();
+        _brushMade.Clear();
     }
 
 }

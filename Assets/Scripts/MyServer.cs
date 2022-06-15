@@ -91,9 +91,9 @@ public static MyServer Instance;
         photonView.RPC("RPC_CreateBrush", _server, player,startPos ,endPos);
         
     }
-    public void RequestDrawAction(Player player,Vector2 endPos)
+    public void RequestDrawAction(Player player,Vector2 actualPos)
     {
-        photonView.RPC("RPC_DrawAction", _server, player,endPos);
+        photonView.RPC("RPC_DrawAction", _server, player,actualPos);
         
     }
     public void RequestEndDrawAction(Player player)
@@ -128,11 +128,11 @@ public static MyServer Instance;
         }
     } 
     [PunRPC]
-    void RPC_DrawAction(Player playerRequested,Vector2 pointPos)
+    void RPC_DrawAction(Player playerRequested,Vector2 actualPos)
     {
         if (_dictModels.ContainsKey(playerRequested))
-        {
-            _dictModels[playerRequested].DrawAction(pointPos);
+        { 
+            _dictModels[playerRequested].DrawAction(actualPos);
         }
     }
     
