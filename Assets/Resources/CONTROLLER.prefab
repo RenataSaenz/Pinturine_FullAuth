@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainCam: {fileID: -1740395522106950079}
+  brush: {fileID: 6939725450922524347, guid: a3507498616def94b9c24f80eed26c41, type: 3}
+  _brushMade: []
 --- !u!20 &-1740395522106950079
 Camera:
   m_ObjectHideFlags: 0

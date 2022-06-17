@@ -4,16 +4,59 @@ using Photon.Pun;
 using UnityEngine;
 using Photon.Realtime;
 
-public class Brush :  MonoBehaviourPun
+public class Brush :  MonoBehaviourPunCallbacks, IPunObservable
 {
-    CharacterFA _owner;
     public LineRenderer lineRenderer;
-
-    public Brush SetOwner(CharacterFA owner)
+    Player _owner;
+    
+    
+    public Brush SetInitialParameters(Player player, Vector2 pos)
     {
-        _owner = owner;
+        _owner = player;
+
+        photonView.RPC("SetLocalParms", _owner);
+
+        lineRenderer = gameObject.GetComponent<LineRenderer>();
+        
+        lineRenderer.SetPosition(0, pos);
+        lineRenderer.SetPosition(1, pos);
+
+        Debug.Log("INITIAL PARAMETERS");
+
         return this;
     }
+    [PunRPC]
+    void DisconnectOwner()
+    {
+        Debug.LogWarning("SE DESCONECTO");
+        PhotonNetwork.Disconnect();
+    }
+    [PunRPC]
+    void SetLocalParms()
+    {
+        _owner = PhotonNetwork.LocalPlayer;
+
+        Debug.Log("LOCAL PARAMETERS");
+    }
+    private void OnApplicationQuit()
+    {
+        if (_owner == PhotonNetwork.LocalPlayer)
+        {
+            MyServer.Instance.RequestDisconnection(_owner);
+        }
+        PhotonNetwork.Disconnect();
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+        }
+        else
+        {
+        }
+    }
+
 
     public Brush SetMaterialColor(Color color)
     {
@@ -32,8 +75,6 @@ public class Brush :  MonoBehaviourPun
     {
         lineRenderer.positionCount++;
         int positionIndex = lineRenderer.positionCount - 1;
-        Debug.Log(pos);
-        Debug.Log("entre");
         lineRenderer.SetPosition(positionIndex, pos);
     } 
 }

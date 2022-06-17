@@ -10,12 +10,12 @@ public class MyServer : MonoBehaviourPun
 public static MyServer Instance;
 
     Player _server;
-    
-    public Brush brush;
 
     [SerializeField] CharacterFA _characterPrefab;
+    [SerializeField] Brush _brushPrefab;
 
     Dictionary<Player, CharacterFA> _dictModels = new Dictionary<Player, CharacterFA>();
+    Dictionary<Player, List<Brush>> _dictBrushes = new Dictionary<Player, List<Brush>>();
     Dictionary<Player,CharacterViewFA> _dictViews = new Dictionary<Player, CharacterViewFA>();
 
     public int PackagePerSecond { get; private set; }
@@ -81,6 +81,7 @@ public static MyServer Instance;
                                                .SetInitialParameters(player);
 
        _dictModels.Add(player, newCharacter);
+       _dictBrushes.Add(player, new List<Brush>());
        _dictViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
     }
 
@@ -91,20 +92,19 @@ public static MyServer Instance;
     
     public void RequestCreateBrush(Player player,Vector2 startPos ,Vector2 endPos)
     {
-        photonView.RPC("RPC_CreateBrush", _server, player,startPos ,endPos);
-        
+        Brush newBrush = PhotonNetwork.Instantiate(_brushPrefab.name,Vector3.zero, Quaternion.identity)
+            .GetComponent<Brush>()
+            .SetInitialParameters(player, startPos);
+
+        _dictBrushes[player].Add(newBrush.GetComponent<Brush>());
+            
+        //photonView.RPC("RPC_CreateBrush", _server, player,startPos ,endPos);
     }
     public void RequestDrawAction(Player player,Vector2 actualPos)
     {
         photonView.RPC("RPC_DrawAction", _server, player,actualPos);
-        //photonView.RPC("RPC_DrawAction", _server, player,actualPos);
         
     }
-    public void RequestEndDrawAction(Player player)
-    {
-        photonView.RPC("RPC_EndDrawAction", _server, player);
-        
-    }    
     public void RequestClearDraw(Player player)
     {
         photonView.RPC("RPC_ClearDraw", _server, player);
@@ -113,8 +113,6 @@ public static MyServer Instance;
 
     public void RequestDisconnection(Player player)
     {
-        Debug.LogWarning("ENVIO RPC");
-
         //PhotonNetwork.SendAllOutgoingCommands();
         photonView.RPC("RPC_PlayerDisconnect", _server, player);
         PhotonNetwork.SendAllOutgoingCommands();
@@ -124,32 +122,28 @@ public static MyServer Instance;
 
     #region SERVER ORIGINAL
     
-    [PunRPC]
-    void RPC_CreateBrush(Player playerRequested,Vector2 startPos ,Vector2 endPos)
-    {
-        if (_dictModels.ContainsKey(playerRequested))
-        {
-            _dictModels[playerRequested].CreateBrush( startPos, endPos);
-        }
-    } 
+    // [PunRPC]
+    // void RPC_CreateBrush(Player playerRequested,Vector2 startPos ,Vector2 endPos)
+    // {
+    //     if (_dictModels.ContainsKey(playerRequested))
+    //     {
+    //         _dictModels[playerRequested].CreateBrush( startPos, endPos);
+    //     }
+    // } 
+    
     [PunRPC]
     void RPC_DrawAction(Player playerRequested,Vector2 actualPos)
     {
         if (_dictModels.ContainsKey(playerRequested))
         { 
-            Debug.Log("buenas que tal");
-            _dictModels[playerRequested].DrawAction(actualPos);
             _dictModels[playerRequested].Move(actualPos);
         }
-    }
-    
-    [PunRPC]
-    private void RPC_EndDrawAction(Player playerRequested)
-    {
-        if (_dictModels.ContainsKey(playerRequested))
+
+        if (_dictBrushes.ContainsKey(playerRequested))
         {
-            _dictModels[playerRequested].EndDrawAction();
+            _dictBrushes[playerRequested].Last().SetNewPoint(actualPos);
         }
+
     }
 
     [PunRPC]
@@ -157,7 +151,7 @@ public static MyServer Instance;
     {
         if (_dictModels.ContainsKey(playerRequested))
         {
-            _dictModels[playerRequested].ClearDraw();
+            //_dictModels[playerRequested].ClearDraw();
         }
     }
 

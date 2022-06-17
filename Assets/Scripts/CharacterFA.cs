@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,9 +9,8 @@ using System.Linq;
 public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
 { 
     Player _owner;
-    public Brush brush;
-    [SerializeField] private List<Brush> _brushMade = new List<Brush>();
-    //public LineRenderer currentLineRenderer;
+   // public Brush brush;
+   // [SerializeField] private List<Brush> _brushMade = new List<Brush>();
 
     public CharacterFA SetInitialParameters(Player player)
     {
@@ -43,7 +43,7 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
         }
         PhotonNetwork.Disconnect();
     }
-    
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -53,28 +53,39 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
         {
         }
     }
-
+/*
     public void CreateBrush(Vector2 startPos, Vector2 endPos)
     {
-        var brushInstance = PhotonNetwork.Instantiate(brush.name, transform.position, transform.rotation)
-            .GetComponent<Brush>()
-            .SetOwner(this)
-            .SetStartingPosition(startPos);
-        _brushMade.Add(brushInstance);
-      
+        // PhotonNetwork.Instantiate(brush.name, transform.position, transform.rotation)
+        //     .GetComponent<Brush>()
+        //     .SetStartingPosition(startPos)
+        //     .transform.SetParent(this.gameObject.transform);
     }
+
+    private void Update()
+    {
+        var instBrush = FindObjectOfType<Brush>();
+        if (instBrush == null) return;
+        if (!_brushMade.Contains(instBrush))_brushMade.Add(instBrush);
+    }
+     public void DrawAction( Vector2  pointPos)
+    {
+        if (_brushMade.LastOrDefault() != default)
+        {
+            Debug.Log("draw action");
+            _brushMade.Last().SetNewPoint(pointPos);
+        }
+    }
+*/
     public void Move(Vector2 pos)
     {
         transform.position = pos;
     }
 
-    public void DrawAction( Vector2  pointPos)
-    {
-        Debug.Log("draw action");
-        _brushMade.Last().SetNewPoint(pointPos);
-    }
+   
     
-    public void EndDrawAction()
+    
+   /* public void EndDrawAction()
     {
         //currentLineRenderer = null;
     }
@@ -85,6 +96,6 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
             Destroy(d.gameObject);
         }
         _brushMade.Clear();
-    }
+    }*/
 
 }
