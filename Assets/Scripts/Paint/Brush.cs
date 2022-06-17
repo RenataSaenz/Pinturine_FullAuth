@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine;
+using Photon.Realtime;
 
-public class Brush : MonoBehaviourPun
+public class Brush :  MonoBehaviourPun
 {
     CharacterFA _owner;
     public LineRenderer lineRenderer;
@@ -27,22 +27,13 @@ public class Brush : MonoBehaviourPun
         lineRenderer.SetPosition(1, pos);
         return this;
     } 
-    // [PunRPC]
-    // void SetStartingPosition(Player clientOwner, int index, Vector2 pos)
-    // {  Debug.Log("draw action");
-    //     lineRenderer.positionCount++;
-    //     int positionIndex = lineRenderer.positionCount - 1;
-    //     Debug.Log(pos);
-    //     lineRenderer.SetPosition(positionIndex, pos);
-    // }
     
-    [PunRPC]
-    void SetNewPosition(Player clientOwner,  Vector2 pos)
-    {  Debug.Log("draw action");
+    public void SetNewPoint(Vector2 pos)
+    {
         lineRenderer.positionCount++;
         int positionIndex = lineRenderer.positionCount - 1;
         Debug.Log(pos);
+        Debug.Log("entre");
         lineRenderer.SetPosition(positionIndex, pos);
-    }
-
+    } 
 }

@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Linq;
 
 public class MyServer : MonoBehaviourPun
 {
 public static MyServer Instance;
 
     Player _server;
+    
+    public Brush brush;
 
     [SerializeField] CharacterFA _characterPrefab;
 
@@ -94,6 +97,7 @@ public static MyServer Instance;
     public void RequestDrawAction(Player player,Vector2 actualPos)
     {
         photonView.RPC("RPC_DrawAction", _server, player,actualPos);
+        //photonView.RPC("RPC_DrawAction", _server, player,actualPos);
         
     }
     public void RequestEndDrawAction(Player player)
@@ -119,6 +123,7 @@ public static MyServer Instance;
     #endregion
 
     #region SERVER ORIGINAL
+    
     [PunRPC]
     void RPC_CreateBrush(Player playerRequested,Vector2 startPos ,Vector2 endPos)
     {
@@ -132,7 +137,9 @@ public static MyServer Instance;
     {
         if (_dictModels.ContainsKey(playerRequested))
         { 
+            Debug.Log("buenas que tal");
             _dictModels[playerRequested].DrawAction(actualPos);
+            _dictModels[playerRequested].Move(actualPos);
         }
     }
     

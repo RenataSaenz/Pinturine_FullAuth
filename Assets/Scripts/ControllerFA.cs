@@ -14,6 +14,7 @@ public class ControllerFA : MonoBehaviourPun
     Vector2 _actualPos;
     
     
+    
     Action _ArtificialUpdateLeftClick;
 
     void Start()
@@ -26,11 +27,9 @@ public class ControllerFA : MonoBehaviourPun
 
     private void Update()
     {
-      //  DrawAction();
-      
-      
         if (Input.GetKeyDown(KeyCode.C))
         {
+            _mainCam = Camera.main;
             MyServer.Instance.RequestClearDraw(_localPlayer);
         }
 
