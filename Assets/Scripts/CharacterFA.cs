@@ -53,49 +53,10 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
         {
         }
     }
-/*
-    public void CreateBrush(Vector2 startPos, Vector2 endPos)
-    {
-        // PhotonNetwork.Instantiate(brush.name, transform.position, transform.rotation)
-        //     .GetComponent<Brush>()
-        //     .SetStartingPosition(startPos)
-        //     .transform.SetParent(this.gameObject.transform);
-    }
-
-    private void Update()
-    {
-        var instBrush = FindObjectOfType<Brush>();
-        if (instBrush == null) return;
-        if (!_brushMade.Contains(instBrush))_brushMade.Add(instBrush);
-    }
-     public void DrawAction( Vector2  pointPos)
-    {
-        if (_brushMade.LastOrDefault() != default)
-        {
-            Debug.Log("draw action");
-            _brushMade.Last().SetNewPoint(pointPos);
-        }
-    }
-*/
     public void Move(Vector2 pos)
     {
         transform.position = pos;
     }
 
-   
-    
-    
-   /* public void EndDrawAction()
-    {
-        //currentLineRenderer = null;
-    }
-    public void ClearDraw()
-    {
-        foreach (var d in _brushMade)
-        {
-            Destroy(d.gameObject);
-        }
-        _brushMade.Clear();
-    }*/
 
 }

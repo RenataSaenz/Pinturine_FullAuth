@@ -87,8 +87,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51dce766f56bea34fa66ff21c3b3273a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brush: {fileID: 6939725450922524347, guid: a3507498616def94b9c24f80eed26c41, type: 3}
-  _brushMade: []
 --- !u!114 &-7514065668887258550
 MonoBehaviour:
   m_ObjectHideFlags: 0

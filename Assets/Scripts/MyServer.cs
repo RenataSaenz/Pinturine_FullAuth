@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +8,7 @@ using System.Linq;
 
 public class MyServer : MonoBehaviourPun
 {
-public static MyServer Instance;
+    public static MyServer Instance;
 
     Player _server;
 
@@ -16,7 +17,9 @@ public static MyServer Instance;
 
     Dictionary<Player, CharacterFA> _dictModels = new Dictionary<Player, CharacterFA>();
     Dictionary<Player, List<Brush>> _dictBrushes = new Dictionary<Player, List<Brush>>();
+    //Dictionary<Player, Brush> _dictBrushes = new Dictionary<Player, Brush>();
     Dictionary<Player,CharacterViewFA> _dictViews = new Dictionary<Player, CharacterViewFA>();
+   // public List<Brush> list = new List<Brush>();
 
     public int PackagePerSecond { get; private set; }
 
@@ -34,6 +37,13 @@ public static MyServer Instance;
             }
         }
     }
+
+    // private void Update()
+    // {
+    //     var brushToList = FindObjectOfType<Brush>();
+    //     if (brushToList == null) return;
+    //     if (!list.Contains(brushToList))list.Add(brushToList);
+    // }
 
     [PunRPC]
     void SetServer(Player serverPlayer, int sceneIndex = 1)
@@ -58,7 +68,6 @@ public static MyServer Instance;
         {
             //Este RPC lo ejecuta cada servidor avatar en direccion al server original
             photonView.RPC("AddPlayer", _server, playerLocal);
-            Debug.Log("je");
         }
 
     }
@@ -79,9 +88,12 @@ public static MyServer Instance;
        CharacterFA newCharacter = PhotonNetwork.Instantiate(_characterPrefab.name, Vector3.zero, Quaternion.identity)
                                                .GetComponent<CharacterFA>()
                                                .SetInitialParameters(player);
+       // Brush newBrush = PhotonNetwork.Instantiate(_brushPrefab.name,Vector3.zero, Quaternion.identity)
+       //     .GetComponent<Brush>()
+       //     .SetInitialParameters(player, Vector3.zero);
 
        _dictModels.Add(player, newCharacter);
-       _dictBrushes.Add(player, new List<Brush>());
+       _dictBrushes.Add(player,new List<Brush>());
        _dictViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
     }
 
@@ -92,23 +104,24 @@ public static MyServer Instance;
     
     public void RequestCreateBrush(Player player,Vector2 startPos ,Vector2 endPos)
     {
-        Brush newBrush = PhotonNetwork.Instantiate(_brushPrefab.name,Vector3.zero, Quaternion.identity)
-            .GetComponent<Brush>()
-            .SetInitialParameters(player, startPos);
-
-        _dictBrushes[player].Add(newBrush.GetComponent<Brush>());
-            
-        //photonView.RPC("RPC_CreateBrush", _server, player,startPos ,endPos);
+        // Brush newBrush = PhotonNetwork.Instantiate(_brushPrefab.name,Vector3.zero, Quaternion.identity)
+        //     .GetComponent<Brush>()
+        //     .SetInitialParameters(player, startPos);
+        //
+        // _dictBrushes[player] = newBrush;
+        
+        //     _dictBrushes[player].Add(newBrush.GetComponent<Brush>());
+        // list.Add(newBrush);
+        
+        photonView.RPC("RPC_CreateBrush", _server, player,startPos ,endPos);
     }
     public void RequestDrawAction(Player player,Vector2 actualPos)
     {
         photonView.RPC("RPC_DrawAction", _server, player,actualPos);
-        
     }
     public void RequestClearDraw(Player player)
     {
         photonView.RPC("RPC_ClearDraw", _server, player);
-        
     }
 
     public void RequestDisconnection(Player player)
@@ -122,14 +135,25 @@ public static MyServer Instance;
 
     #region SERVER ORIGINAL
     
-    // [PunRPC]
-    // void RPC_CreateBrush(Player playerRequested,Vector2 startPos ,Vector2 endPos)
-    // {
-    //     if (_dictModels.ContainsKey(playerRequested))
-    //     {
-    //         _dictModels[playerRequested].CreateBrush( startPos, endPos);
-    //     }
-    // } 
+    [PunRPC]
+    void RPC_CreateBrush(Player playerRequested,Vector2 startPos ,Vector2 endPos)
+    {
+        if (_dictModels.ContainsKey(playerRequested))
+        {
+            _dictModels[playerRequested].Move(startPos);
+            
+           Brush newBrush = PhotonNetwork.Instantiate(_brushPrefab.name,Vector3.zero, Quaternion.identity)
+               .GetComponent<Brush>()
+               .SetInitialParameters(playerRequested);
+           
+           _dictBrushes[playerRequested].Add(newBrush);
+        }
+
+        if (_dictBrushes.ContainsKey(playerRequested))
+        {
+            _dictBrushes[playerRequested].Last().photonView.RPC("RPC_SetStartingPosition",RpcTarget.All, startPos);
+        }
+    } 
     
     [PunRPC]
     void RPC_DrawAction(Player playerRequested,Vector2 actualPos)
@@ -141,17 +165,21 @@ public static MyServer Instance;
 
         if (_dictBrushes.ContainsKey(playerRequested))
         {
-            _dictBrushes[playerRequested].Last().SetNewPoint(actualPos);
+            _dictBrushes[playerRequested].Last().photonView.RPC("RPC_DrawPoint",RpcTarget.All, actualPos);
+            
         }
-
     }
 
     [PunRPC]
     private void RPC_ClearDraw(Player playerRequested)
     {
-        if (_dictModels.ContainsKey(playerRequested))
+        if (_dictBrushes.ContainsKey(playerRequested))
         {
-            //_dictModels[playerRequested].ClearDraw();
+            for (int i = 0; i < _dictBrushes[playerRequested].Count; i++)
+            {
+                _dictBrushes[playerRequested][i].Clear();
+            }
+            _dictBrushes[playerRequested].Clear();
         }
     }
 

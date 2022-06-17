@@ -8,9 +8,8 @@ public class Brush :  MonoBehaviourPunCallbacks, IPunObservable
 {
     public LineRenderer lineRenderer;
     Player _owner;
-    
-    
-    public Brush SetInitialParameters(Player player, Vector2 pos)
+
+    public Brush SetInitialParameters(Player player)
     {
         _owner = player;
 
@@ -18,19 +17,19 @@ public class Brush :  MonoBehaviourPunCallbacks, IPunObservable
 
         lineRenderer = gameObject.GetComponent<LineRenderer>();
         
-        lineRenderer.SetPosition(0, pos);
-        lineRenderer.SetPosition(1, pos);
 
         Debug.Log("INITIAL PARAMETERS");
 
         return this;
     }
+    
     [PunRPC]
     void DisconnectOwner()
     {
         Debug.LogWarning("SE DESCONECTO");
         PhotonNetwork.Disconnect();
     }
+    
     [PunRPC]
     void SetLocalParms()
     {
@@ -38,6 +37,7 @@ public class Brush :  MonoBehaviourPunCallbacks, IPunObservable
 
         Debug.Log("LOCAL PARAMETERS");
     }
+    
     private void OnApplicationQuit()
     {
         if (_owner == PhotonNetwork.LocalPlayer)
@@ -51,27 +51,34 @@ public class Brush :  MonoBehaviourPunCallbacks, IPunObservable
     {
         if (stream.IsWriting)
         {
+            
         }
         else
         {
+            
         }
     }
-
-
+    
     public Brush SetMaterialColor(Color color)
     {
         GetComponent<Renderer>().material.color = color;
         return this;
-    } 
+    }
     
-    public Brush SetStartingPosition(Vector2 pos)
+    [PunRPC]
+    public void RPC_SetStartingPosition(Vector2 pos)
     {
         lineRenderer.SetPosition(0, pos);
         lineRenderer.SetPosition(1, pos);
-        return this;
+    }
+    
+    public void Clear()
+    {
+        PhotonNetwork.Destroy(gameObject);
     } 
     
-    public void SetNewPoint(Vector2 pos)
+    [PunRPC]
+    public void RPC_DrawPoint(Vector2 pos)
     {
         lineRenderer.positionCount++;
         int positionIndex = lineRenderer.positionCount - 1;

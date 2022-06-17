@@ -13,10 +13,9 @@ public class ControllerFA : MonoBehaviourPun
     private Vector2 lastPos;
     
     Vector2 _actualPos;
-    
-    
-    
-   // Action _ArtificialUpdateLeftClick;
+
+
+    // Action _ArtificialUpdateLeftClick;
 
     void Start()
     {
@@ -55,41 +54,6 @@ public class ControllerFA : MonoBehaviourPun
             MyServer.Instance.RequestClearDraw(_localPlayer);
         }
     }
-    
-    // void SimpleClick()
-    // { 
-    //     if (Input.GetMouseButtonDown(0))
-    //     {
-    //         //Transform hittedObject;
-    //
-    //         _actualPos = _mainCam.ScreenToWorldPoint(Input.mousePosition);
-    //         
-    //         //if (hittedObject == null) return;
-    //         
-    //         MyServer.Instance.RequestCreateBrush(_localPlayer, _actualPos, _actualPos);
-    //
-    //         _ArtificialUpdateLeftClick = DuringSimpleClick;
-    //     }
-    // }
-    //
-    // void DuringSimpleClick()
-    // {
-    //     //Transform hittedObject;
-    //
-    //     _actualPos = _mainCam.ScreenToWorldPoint(Input.mousePosition);
-    //
-    //     if (_actualPos != lastPos)
-    //     {
-    //             MyServer.Instance.RequestDrawAction(_localPlayer, _actualPos);
-    //             lastPos = _actualPos;
-    //         }
-    //     
-    //     if (Input.GetMouseButtonUp(0))
-    //     {
-    //         _ArtificialUpdateLeftClick = SimpleClick;
-    //     }
-    // }
-    //
 
 
 }
