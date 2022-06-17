@@ -13,7 +13,7 @@ public class CanvasButtons : MonoBehaviour
     
     public void BTN_SelectWord(TMP_Text word)
     {
-        PlayerManager.instace.StartGame(word.text);
+       // PlayerManager.instace.StartGame(word.text);
         foreach (var button in _buttons) {button.SetActive(false);}
     }
 }

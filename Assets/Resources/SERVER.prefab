@@ -68,3 +68,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterPrefab: {fileID: 1071239122629356994, guid: 725001d61ec36a04d89df4d91bf80391, type: 3}
   _brushPrefab: {fileID: 6939725450922524347, guid: a3507498616def94b9c24f80eed26c41, type: 3}
+  _words:
+  - Shrek
+  - Messi
+  - Danonino
+  - Duki
+  - Macri
+  - Gato
+  - Cristina
+  - Chorra
+  - Medialuna
+  - Chocolate
+  savedWord: 

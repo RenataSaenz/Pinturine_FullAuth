@@ -72,6 +72,8 @@ MonoBehaviour:
   - RPC_DrawPoint
   - RPC_SetStartingPosition
   - RPC_Clear
+  - RPC_StartGame
+  - RPC_SetButtons
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

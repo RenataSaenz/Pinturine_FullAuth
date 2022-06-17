@@ -5,6 +5,8 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
+using TMPro;
+using Random = UnityEngine.Random;
 
 public class MyServer : MonoBehaviourPun
 {
@@ -17,9 +19,15 @@ public class MyServer : MonoBehaviourPun
 
     Dictionary<Player, CharacterFA> _dictModels = new Dictionary<Player, CharacterFA>();
     Dictionary<Player, List<Brush>> _dictBrushes = new Dictionary<Player, List<Brush>>();
-    //Dictionary<Player, Brush> _dictBrushes = new Dictionary<Player, Brush>();
     Dictionary<Player,CharacterViewFA> _dictViews = new Dictionary<Player, CharacterViewFA>();
-   // public List<Brush> list = new List<Brush>();
+    
+    [SerializeField] private List<string> _words = new List<string>();
+    private TMP_Text _wordSpace;
+    
+    public string savedWord;
+  
+
+    [SerializeField] private Player _turn;
 
     public int PackagePerSecond { get; private set; }
 
@@ -37,13 +45,6 @@ public class MyServer : MonoBehaviourPun
             }
         }
     }
-
-    // private void Update()
-    // {
-    //     var brushToList = FindObjectOfType<Brush>();
-    //     if (brushToList == null) return;
-    //     if (!list.Contains(brushToList))list.Add(brushToList);
-    // }
 
     [PunRPC]
     void SetServer(Player serverPlayer, int sceneIndex = 1)
@@ -84,35 +85,53 @@ public class MyServer : MonoBehaviourPun
         {
             yield return new WaitForEndOfFrame();
         }
-
+        
        CharacterFA newCharacter = PhotonNetwork.Instantiate(_characterPrefab.name, Vector3.zero, Quaternion.identity)
                                                .GetComponent<CharacterFA>()
                                                .SetInitialParameters(player);
-       // Brush newBrush = PhotonNetwork.Instantiate(_brushPrefab.name,Vector3.zero, Quaternion.identity)
-       //     .GetComponent<Brush>()
-       //     .SetInitialParameters(player, Vector3.zero);
 
-       _dictModels.Add(player, newCharacter);
+        _dictModels.Add(player, newCharacter);
        _dictBrushes.Add(player,new List<Brush>());
        _dictViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
+
+       if (_dictModels.Keys.First() == player) _turn = player;
+    }
+
+    public void StartGame()
+    {
+       // _turn = _dictModels.Keys.First();
     }
 
 
     #region REQUESTES QUE RECIBEN LOS SERVIDORES AVATARES
 
     //Esto lo recibe del Controller y va a llamar por RPC a la funcion Move del host real
-    
+
+    public void RequestStartGame(WaitingPlayers obj)
+    {
+        List<String> randomWords = new List<String>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            string randomString = _words[Random.Range (0, _words.Count)];
+            randomWords.Add(randomString);
+            _words.Remove(randomString);
+        }
+        
+        photonView.RPC("RPC_SetButtons", _server,_turn, randomWords);
+        photonView.RPC("RPC_StartGame", _server, obj);
+    }
+
+    public void RequestChangeTurn()
+    {
+        if (_words.Count < 3)
+        { 
+            //photonView.RPC("RPC_GameOver", RpcTarget.All);
+            return;
+        }
+    }
     public void RequestCreateBrush(Player player,Vector2 startPos ,Vector2 endPos)
     {
-        // Brush newBrush = PhotonNetwork.Instantiate(_brushPrefab.name,Vector3.zero, Quaternion.identity)
-        //     .GetComponent<Brush>()
-        //     .SetInitialParameters(player, startPos);
-        //
-        // _dictBrushes[player] = newBrush;
-        
-        //     _dictBrushes[player].Add(newBrush.GetComponent<Brush>());
-        // list.Add(newBrush);
-        
         photonView.RPC("RPC_CreateBrush", _server, player,startPos ,endPos);
     }
     public void RequestDrawAction(Player player,Vector2 actualPos)
@@ -134,10 +153,26 @@ public class MyServer : MonoBehaviourPun
     #endregion
 
     #region SERVER ORIGINAL
-    
+
+    [PunRPC]
+    void RPC_StartGame(WaitingPlayers obj)
+    {
+        obj.Clear();
+    }
+
+    [PunRPC]
+    void RPC_SetButtons(Player playerRequested, List<String> words)
+    {
+        if (_dictModels.ContainsKey(playerRequested))
+        { 
+            _dictModels[playerRequested].SetMenu(playerRequested, words);
+        }
+    }
     [PunRPC]
     void RPC_CreateBrush(Player playerRequested,Vector2 startPos ,Vector2 endPos)
     {
+        if (_turn != playerRequested) return;
+        
         if (_dictModels.ContainsKey(playerRequested))
         {
             _dictModels[playerRequested].Move(startPos);
@@ -158,6 +193,8 @@ public class MyServer : MonoBehaviourPun
     [PunRPC]
     void RPC_DrawAction(Player playerRequested,Vector2 actualPos)
     {
+        if (_turn != playerRequested) return;
+        
         if (_dictModels.ContainsKey(playerRequested))
         { 
             _dictModels[playerRequested].Move(actualPos);
@@ -173,6 +210,8 @@ public class MyServer : MonoBehaviourPun
     [PunRPC]
     private void RPC_ClearDraw(Player playerRequested)
     {
+        if (_turn != playerRequested) return;
+        
         if (_dictBrushes.ContainsKey(playerRequested))
         {
             for (int i = 0; i < _dictBrushes[playerRequested].Count; i++)
