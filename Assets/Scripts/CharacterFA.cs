@@ -18,17 +18,16 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
     {
         _owner = player;
 
-        photonView.RPC("SetLocalParms", _owner);
+        photonView.RPC("SetLocalParams", _owner);
 
-        Debug.Log("INITIAL PARAMETERS");
+        _buttons.Add(FindObjectOfType<CanvasButtons>().GetButtons()[0]);
+        _buttons.Add(FindObjectOfType<CanvasButtons>().GetButtons()[1]);
+        _buttons.Add(FindObjectOfType<CanvasButtons>().GetButtons()[2]);
         
-        _buttons.Add(GameObject.FindGameObjectWithTag("BTN_1"));
-        _buttons.Add(GameObject.FindGameObjectWithTag("BTN_2"));
-        _buttons.Add(GameObject.FindGameObjectWithTag("BTN_3"));
         
         foreach (var button in _buttons)
         {
-         button.SetActive(false);
+            button.SetActive(false);
         }
 
         return this;
@@ -36,15 +35,13 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void DisconnectOwner()
     {
-        Debug.LogWarning("SE DESCONECTO");
         PhotonNetwork.Disconnect();
     }
     [PunRPC]
-    void SetLocalParms()
+    void SetLocalParams()
     {
         _owner = PhotonNetwork.LocalPlayer;
 
-        Debug.Log("LOCAL PARAMETERS");
     }
     private void OnApplicationQuit()
     {
@@ -65,7 +62,7 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    public void SetMenu(Player clientOwner, List<String> words)
+    public void SetMenu(Player clientOwner, string[] words)
     {
         if (PhotonNetwork.LocalPlayer != clientOwner)
         {
@@ -77,35 +74,31 @@ public class CharacterFA : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
     
-    void SetButtons( List<String> words)
+    void SetButtons( string[] words)
     {
-        // List<String> randomWords = new List<String>();
+        // List<string> randomWords = new List<string>();
         //
         // for (int i = 0; i < words.Count; i++)
         // {
         //     randomWords.Add(words[i]);
         // }
-        foreach (var button in _buttons) {button.SetActive(true);}
 
-        Debug.Log("set buttons");
-        foreach (var button in _buttons)
+        for (int i = 0; i < _buttons.Count; i++)
         {
-            var b = button.GetComponentInChildren<TMP_Text>();
-            string randomString = words[Random.Range (0, words.Count)];
-            words.Remove(randomString);
-            b.text = randomString;
-            Debug.Log(randomString);
+            _buttons[i].SetActive(true);
+            var b =_buttons[i].GetComponentInChildren<TMP_Text>();
+            //string randomString = words[Random.Range (0, words.Length)];
+            //words.Remove(randomString);
+            b.text =  words[i];
         }
     }
 
     void WaitingButtons()
     {
-        
-        foreach (var button in _buttons) {button.SetActive(true);}
-
         Debug.Log("set buttons");
         foreach (var button in _buttons)
         {
+            button.SetActive(true);
             var b = button.GetComponentInChildren<TMP_Text>();
             b.text = "waiting for player";
         }

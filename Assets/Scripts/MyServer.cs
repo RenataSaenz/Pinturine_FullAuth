@@ -21,11 +21,10 @@ public class MyServer : MonoBehaviourPun
     Dictionary<Player, List<Brush>> _dictBrushes = new Dictionary<Player, List<Brush>>();
     Dictionary<Player,CharacterViewFA> _dictViews = new Dictionary<Player, CharacterViewFA>();
     
-    [SerializeField] private List<string> _words = new List<string>();
-    private TMP_Text _wordSpace;
+    [SerializeField] private string[] _words;
+    //private TMP_Text _wordSpace;
     
-    public string savedWord;
-  
+    //public string savedWord;
 
     [SerializeField] private Player _turn;
 
@@ -109,22 +108,22 @@ public class MyServer : MonoBehaviourPun
 
     public void RequestStartGame(WaitingPlayers obj)
     {
-        List<String> randomWords = new List<String>();
-
-        for (int i = 0; i < 3; i++)
-        {
-            string randomString = _words[Random.Range (0, _words.Count)];
-            randomWords.Add(randomString);
-            _words.Remove(randomString);
-        }
+        // string[] randomWords;
+        //
+        // for (int i = 0; i < 3; i++)
+        // {
+        //     string randomString = _words[Random.Range (0, _words.Length)];
+        //     randomWords.Add(randomString);
+        //    // _words.Remove(randomString);
+        // }
         
-        photonView.RPC("RPC_SetButtons", _server,_turn, randomWords);
+        photonView.RPC("RPC_SetButtons", _server,_turn, _words);
         photonView.RPC("RPC_StartGame", _server, obj);
     }
 
     public void RequestChangeTurn()
     {
-        if (_words.Count < 3)
+        if (_words.Length < 3)
         { 
             //photonView.RPC("RPC_GameOver", RpcTarget.All);
             return;
@@ -148,8 +147,7 @@ public class MyServer : MonoBehaviourPun
         //PhotonNetwork.SendAllOutgoingCommands();
         photonView.RPC("RPC_PlayerDisconnect", _server, player);
         PhotonNetwork.SendAllOutgoingCommands();
-    }
-
+    } 
     #endregion
 
     #region SERVER ORIGINAL
@@ -161,7 +159,7 @@ public class MyServer : MonoBehaviourPun
     }
 
     [PunRPC]
-    void RPC_SetButtons(Player playerRequested, List<String> words)
+    void RPC_SetButtons(Player playerRequested, string[] words)
     {
         if (_dictModels.ContainsKey(playerRequested))
         { 

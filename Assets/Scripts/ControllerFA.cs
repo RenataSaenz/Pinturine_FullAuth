@@ -21,6 +21,8 @@ public class ControllerFA : MonoBehaviourPun
     {
         DontDestroyOnLoad(gameObject);
         _localPlayer = PhotonNetwork.LocalPlayer;
+        
+        
        // _ArtificialUpdateLeftClick = SimpleClick;
     }
 

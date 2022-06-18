@@ -9,14 +9,8 @@ public class WaitingPlayers : MonoBehaviourPun
 {
     [SerializeField] private TMP_Text _waitForPlayers;
     [SerializeField] private float time = 0.3f;
-    // [SerializeField] private GameObject _canvas;
     private int count = 1;
-    void Start()
-    {
-        gameObject.SetActive(true);
-    }
 
-    // Update is called once per frame
     void Update()
     { 
         var playerCount = PhotonNetwork.PlayerList.Length - 1;
