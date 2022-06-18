@@ -75,6 +75,14 @@ MonoBehaviour:
   - RPC_StartGame
   - RPC_SetButtons
   - SetLocalParams
+  - RPC_SetMenu
+  - RPC_SetOffButtons
+  - RPC_ReceiveWord
+  - RPC_AssignTurn
+  - RPC_SendMessageToChat
+  - RPC_RemoveWords
+  - RPC_ChangeTurn
+  - RPC_SetScore
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

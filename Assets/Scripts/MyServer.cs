@@ -6,6 +6,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
 using TMPro;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class MyServer : MonoBehaviourPun
@@ -22,13 +23,9 @@ public class MyServer : MonoBehaviourPun
     Dictionary<Player,CharacterViewFA> _dictViews = new Dictionary<Player, CharacterViewFA>();
     
     [SerializeField] private string[] _words;
-    //private TMP_Text _wordSpace;
+
+    public int PackagePerSecond { get; private set;}
     
-    //public string savedWord;
-
-    [SerializeField] private Player _turn;
-
-    public int PackagePerSecond { get; private set; }
 
     void Start()
     {
@@ -44,7 +41,10 @@ public class MyServer : MonoBehaviourPun
             }
         }
     }
+    
 
+    
+ 
     [PunRPC]
     void SetServer(Player serverPlayer, int sceneIndex = 1)
     {
@@ -72,6 +72,7 @@ public class MyServer : MonoBehaviourPun
 
     }
 
+
     [PunRPC]
     void AddPlayer(Player player)
     {
@@ -93,12 +94,28 @@ public class MyServer : MonoBehaviourPun
        _dictBrushes.Add(player,new List<Brush>());
        _dictViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
 
-       if (_dictModels.Keys.First() == player) _turn = player;
-    }
+       //if (_dictModels.Keys.First() == player) _turn = player;
+       //GameManager.Instance.AssignTurn(_dictModels.Keys.First());
+       GameManager.Instance.turn = _dictModels.Keys.First();
 
-    public void StartGame()
+       var playersNames = new List<string>();
+       
+       foreach (var key in _dictModels)
+       {
+           playersNames.Add(key.ToString());
+       }
+       
+       photonView.RPC("RPC_SetScore", RpcTarget.All, playersNames.ToArray());
+    }
+    
+    [PunRPC]
+    void RPC_SetScore(string[] players)
     {
-       // _turn = _dictModels.Keys.First();
+        for (int i = 0; i < players.Length; i++)
+        {
+            GameManager.Instance._playersData[i].nickname = players[i];
+            GameManager.Instance._playersData[i].UpdateData();
+        }
     }
 
 
@@ -106,29 +123,6 @@ public class MyServer : MonoBehaviourPun
 
     //Esto lo recibe del Controller y va a llamar por RPC a la funcion Move del host real
 
-    public void RequestStartGame(WaitingPlayers obj)
-    {
-        // string[] randomWords;
-        //
-        // for (int i = 0; i < 3; i++)
-        // {
-        //     string randomString = _words[Random.Range (0, _words.Length)];
-        //     randomWords.Add(randomString);
-        //    // _words.Remove(randomString);
-        // }
-        
-        photonView.RPC("RPC_SetButtons", _server,_turn, _words);
-        photonView.RPC("RPC_StartGame", _server, obj);
-    }
-
-    public void RequestChangeTurn()
-    {
-        if (_words.Length < 3)
-        { 
-            //photonView.RPC("RPC_GameOver", RpcTarget.All);
-            return;
-        }
-    }
     public void RequestCreateBrush(Player player,Vector2 startPos ,Vector2 endPos)
     {
         photonView.RPC("RPC_CreateBrush", _server, player,startPos ,endPos);
@@ -147,29 +141,30 @@ public class MyServer : MonoBehaviourPun
         //PhotonNetwork.SendAllOutgoingCommands();
         photonView.RPC("RPC_PlayerDisconnect", _server, player);
         PhotonNetwork.SendAllOutgoingCommands();
-    } 
+    }
+
+    public void RequestSendMessage(Player player, string nickName,string newMsg)
+    {
+        photonView.RPC("RPC_SendMessageToChat", _server, player,nickName, newMsg);
+    }
     #endregion
 
     #region SERVER ORIGINAL
-
-    [PunRPC]
-    void RPC_StartGame(WaitingPlayers obj)
-    {
-        obj.Clear();
-    }
-
-    [PunRPC]
-    void RPC_SetButtons(Player playerRequested, string[] words)
+    
+    [PunRPC] 
+    void RPC_SendMessageToChat(Player playerRequested,string nickName,string newMsg)
     {
         if (_dictModels.ContainsKey(playerRequested))
-        { 
-            _dictModels[playerRequested].SetMenu(playerRequested, words);
+        {
+           // PlayerManager.instace.TryWord(nickName, newMsg);
+         //   ChatSystem.Instance.SendMessageToChat(nickName,newMsg );
         }
     }
+
     [PunRPC]
     void RPC_CreateBrush(Player playerRequested,Vector2 startPos ,Vector2 endPos)
     {
-        if (_turn != playerRequested) return;
+        if (!Equals(GameManager.Instance.turn, playerRequested)) return;
         
         if (_dictModels.ContainsKey(playerRequested))
         {
@@ -191,7 +186,7 @@ public class MyServer : MonoBehaviourPun
     [PunRPC]
     void RPC_DrawAction(Player playerRequested,Vector2 actualPos)
     {
-        if (_turn != playerRequested) return;
+        if (!Equals(GameManager.Instance.turn, playerRequested)) return;
         
         if (_dictModels.ContainsKey(playerRequested))
         { 
@@ -208,7 +203,7 @@ public class MyServer : MonoBehaviourPun
     [PunRPC]
     private void RPC_ClearDraw(Player playerRequested)
     {
-        if (_turn != playerRequested) return;
+        if (!Equals(GameManager.Instance.turn, playerRequested)) return;
         
         if (_dictBrushes.ContainsKey(playerRequested))
         {

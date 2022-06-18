@@ -54,9 +54,9 @@ public class PlayerManager : MonoBehaviourPun
         // }
         
         if (instace == null) instace = this;
-        
-        
+
         playerBrush = Instantiate(playerBrush, Vector3.zero, Quaternion.identity);
+        
         
         var playerCount = PhotonNetwork.PlayerList.Length;
         
@@ -143,6 +143,7 @@ public class PlayerManager : MonoBehaviourPun
             else if (onShift == DrawingShift) ChangeShiftToGuessing();
         }
     }
+    
     void ChangeShiftToGuessing()
     {
         savedWord = "";
@@ -153,6 +154,7 @@ public class PlayerManager : MonoBehaviourPun
         onShift = GuessingShift;
         Debug.Log("Changed to Guessing");
     }
+    
     void ChangeShiftToDrawing()
     {
         savedWord = "";
