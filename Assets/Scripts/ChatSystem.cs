@@ -49,14 +49,14 @@ public class ChatSystem : MonoBehaviourPun
         
         if (_messageInputField.text != "" && Input.GetKeyDown(KeyCode.Return))
         { 
-            if (Equals(PhotonNetwork.LocalPlayer, GameManager.Instance.turn) &&_messageInputField.text == GameManager.Instance.savedWord) 
+            if (Equals(PhotonNetwork.LocalPlayer, GameManager.Instance.Turn) &&_messageInputField.text == GameManager.Instance.savedWord) 
                 _messageInputField.text = "***";
             
             //MyServer.Instance.RequestSendMessage(PhotonNetwork.LocalPlayer,PhotonNetwork.LocalPlayer.NickName,_messageInputField.text);
             
             photonView.RPC("RPC_SendMessageToChat",RpcTarget.All, PhotonNetwork.LocalPlayer,_messageInputField.text);
             
-            if (!Equals(PhotonNetwork.LocalPlayer, GameManager.Instance.turn))
+            if (!Equals(PhotonNetwork.LocalPlayer, GameManager.Instance.Turn))
                 GameManager.Instance.TryWord(PhotonNetwork.LocalPlayer,_messageInputField.text);
             
             _messageInputField.text = "";

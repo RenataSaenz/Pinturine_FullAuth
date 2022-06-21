@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using TMPro;
+using System.Linq;
 public class WaitingPlayers : MonoBehaviourPun
 {
     [SerializeField] private TMP_Text _waitForPlayers;
@@ -15,7 +16,7 @@ public class WaitingPlayers : MonoBehaviourPun
     void Update()
     {
         var playerCount = PhotonNetwork.PlayerList.Length - 1;
-        _waitForPlayers.text = "WAITNG FOR PLAYERS" + Environment.NewLine +playerCount + "/2";
+        _waitForPlayers.text = "WAITNG FOR PLAYERS" + Environment.NewLine +playerCount + "/3";
 
         // if (playerCount >= 1)
         // {
@@ -23,7 +24,7 @@ public class WaitingPlayers : MonoBehaviourPun
         //     GameManager.Instance._playersData[playerCount-1].UpdateData();
         // }
 
-        if (playerCount == 2 && count == 1)
+        if (playerCount == 3 && count == 1)
         {
             if (!photonView.IsMine) return;
             StartCoroutine(ExampleCoroutine(time));
@@ -35,7 +36,14 @@ public class WaitingPlayers : MonoBehaviourPun
     IEnumerator ExampleCoroutine(float t)
     {
         yield return new WaitForSeconds(t);
-        ButtonsManager.Instance.SetButtons();
-        PhotonNetwork.Destroy(gameObject);
+        //Debug.Log("is the turn of " + GameManager.Instance.Turn);
+      //  ButtonsManager.Instance.SetButtons();
+      
+      //ButtonsManager.Instance.WaitingButtons();
+      ButtonsManager.Instance.photonView.RPC("RPC_SetWaitingButtons", RpcTarget.All);
+      ButtonsManager.Instance.photonView.RPC("RPC_SetWordsInServer", RpcTarget.MasterClient, GameManager.Instance.Turn);
+
+
+      PhotonNetwork.Destroy(gameObject);
     }
 }
