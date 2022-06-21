@@ -22,7 +22,6 @@ public class MyServer : MonoBehaviourPun
     Dictionary<Player, List<Brush>> _dictBrushes = new Dictionary<Player, List<Brush>>();
     Dictionary<Player,CharacterViewFA> _dictViews = new Dictionary<Player, CharacterViewFA>();
     
-    [SerializeField] private string[] _words;
 
     public int PackagePerSecond { get; private set;}
     
@@ -68,6 +67,7 @@ public class MyServer : MonoBehaviourPun
         {
             //Este RPC lo ejecuta cada servidor avatar en direccion al server original
             photonView.RPC("AddPlayer", _server, playerLocal);
+           
         }
 
     }
@@ -81,42 +81,24 @@ public class MyServer : MonoBehaviourPun
 
     IEnumerator WaitForLevel(Player player)
     {
-        while(PhotonNetwork.LevelLoadingProgress > 0.9f)
+        while (PhotonNetwork.LevelLoadingProgress > 0.9f)
         {
             yield return new WaitForEndOfFrame();
         }
-        
-       CharacterFA newCharacter = PhotonNetwork.Instantiate(_characterPrefab.name, Vector3.zero, Quaternion.identity)
-                                               .GetComponent<CharacterFA>()
-                                               .SetInitialParameters(player);
+
+        CharacterFA newCharacter = PhotonNetwork.Instantiate(_characterPrefab.name, Vector3.zero, Quaternion.identity)
+            .GetComponent<CharacterFA>()
+            .SetInitialParameters(player);
 
         _dictModels.Add(player, newCharacter);
-       _dictBrushes.Add(player,new List<Brush>());
-       _dictViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
-
-       //if (_dictModels.Keys.First() == player) _turn = player;
-       //GameManager.Instance.AssignTurn(_dictModels.Keys.First());
-       GameManager.Instance.turn = _dictModels.Keys.First();
-
-       var playersNames = new List<string>();
-       
-       foreach (var key in _dictModels)
-       {
-           playersNames.Add(key.ToString());
-       }
-       
-       photonView.RPC("RPC_SetScore", RpcTarget.All, playersNames.ToArray());
+        _dictBrushes.Add(player, new List<Brush>());
+        _dictViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
+        
+        GameManager.Instance.Turn = _dictModels.Keys.First();
+        
+        GameManager.Instance.photonView.RPC("RPC_AddPlayerToScore", RpcTarget.AllBuffered, player.NickName);
     }
     
-    [PunRPC]
-    void RPC_SetScore(string[] players)
-    {
-        for (int i = 0; i < players.Length; i++)
-        {
-            GameManager.Instance._playersData[i].nickname = players[i];
-            GameManager.Instance._playersData[i].UpdateData();
-        }
-    }
 
 
     #region REQUESTES QUE RECIBEN LOS SERVIDORES AVATARES
@@ -133,6 +115,7 @@ public class MyServer : MonoBehaviourPun
     }
     public void RequestClearDraw(Player player)
     {
+       // photonView.RPC("RPC_ClearDraw", _server, player);
         photonView.RPC("RPC_ClearDraw", _server, player);
     }
 
@@ -164,7 +147,7 @@ public class MyServer : MonoBehaviourPun
     [PunRPC]
     void RPC_CreateBrush(Player playerRequested,Vector2 startPos ,Vector2 endPos)
     {
-        if (!Equals(GameManager.Instance.turn, playerRequested)) return;
+        if (!Equals(GameManager.Instance.Turn, playerRequested)) return;
         
         if (_dictModels.ContainsKey(playerRequested))
         {
@@ -186,7 +169,7 @@ public class MyServer : MonoBehaviourPun
     [PunRPC]
     void RPC_DrawAction(Player playerRequested,Vector2 actualPos)
     {
-        if (!Equals(GameManager.Instance.turn, playerRequested)) return;
+        if (!Equals(GameManager.Instance.Turn, playerRequested)) return;
         
         if (_dictModels.ContainsKey(playerRequested))
         { 
@@ -203,7 +186,18 @@ public class MyServer : MonoBehaviourPun
     [PunRPC]
     private void RPC_ClearDraw(Player playerRequested)
     {
-        if (!Equals(GameManager.Instance.turn, playerRequested)) return;
+      //  if (!Equals(GameManager.Instance.Turn, playerRequested)) return;
+
+        // for (int index = 0; index < _dictBrushes.Count; index++) 
+        // {
+        //     Debug.LogWarning(index);
+        //     
+        //     var item = GameManager.Instance.dictAreasPlayers.ElementAt(index);
+        //     var itemKey = item.Key;
+        //     var itemValue = item.Value;
+        //     
+        //     _dictBrushes[itemKey][itemValue].Clear();
+        // }
         
         if (_dictBrushes.ContainsKey(playerRequested))
         {

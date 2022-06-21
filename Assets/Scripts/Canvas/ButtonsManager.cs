@@ -27,7 +27,41 @@ public class ButtonsManager : MonoBehaviourPun
 
     public void SetButtons()
     {
-        photonView.RPC("RPC_SetMenu", RpcTarget.All, GameManager.Instance.turn,GameManager.Instance.words.ToArray());
+       
+        photonView.RPC("RPC_SetMenu", RpcTarget.All, GameManager.Instance.Turn,GameManager.Instance.words.ToArray());
+    }
+
+    public void SetButtonsForGame()
+    {
+        photonView.RPC("RPC_SetWordsInServer", RpcTarget.MasterClient, GameManager.Instance.Turn);
+    }
+    
+
+    [PunRPC]
+    void RPC_SetWordsInServer(Player playerTurn)
+    {
+        List<string> selectedWords = new List<string>();
+        List<string> copyWords = new List<string>(GameManager.Instance.words);
+        
+        for (int i = 0; i < _buttons.Count; i++)
+        {
+           // _buttons[i].GetComponent<Button>().interactable = true;
+           // _buttons[i].SetActive(true);
+            //var b =_buttons[i].GetComponentInChildren<TMP_Text>();
+            string randomString = copyWords[Random.Range (0, copyWords.Count)];
+            copyWords.Remove(randomString);
+            //b.text =  randomString;
+            selectedWords.Add(randomString);
+        }
+        
+        for (int i = 0; i < selectedWords.Count; i++)
+        {
+            GameManager.Instance._words.Remove(selectedWords[i]);
+        }
+
+        
+        photonView.RPC("RPC_SetMenuForTurn", playerTurn, selectedWords.ToArray());
+        //GameManager.Instance.photonView.RPC("RPC_RemoveWords",RpcTarget.All,selectedWords.ToArray());
     }
     
     [PunRPC]
@@ -37,19 +71,47 @@ public class ButtonsManager : MonoBehaviourPun
        {
            button.SetActive(false);
        }
-       
+    }
+
+    [PunRPC]
+    public void RPC_SetMenuForTurn(string[] words)
+    {
+        List<string> selectedWords = new List<string>(words);
+        
+        for (int i = 0; i < _buttons.Count; i++)
+        {
+            _buttons[i].GetComponent<Button>().interactable = true;
+            _buttons[i].SetActive(true);
+            var b =_buttons[i].GetComponentInChildren<TMP_Text>();
+            b.text =  selectedWords[i];
+           // selectedWords.Add(words[i]);
+        }
+        
+        //GameManager.Instance.photonView.RPC("RPC_RemoveWords",RpcTarget.All,selectedWords.ToArray());
     }
     
     [PunRPC]
-    public void RPC_SetMenu(Player clientOwner, string[] words)
+    public void RPC_SetMenu(Player playerTurn, string[] words)
     {
-        if (PhotonNetwork.LocalPlayer != clientOwner)
+        if (PhotonNetwork.LocalPlayer != playerTurn)
         {
             WaitingButtons();
         }
         else
         {
             SetButtons(words);
+        }
+    }
+    
+    [PunRPC]
+    public void RPC_SetWaitingButtons()
+    {
+        foreach (var button in _buttons)
+        {
+            button.SetActive(true);
+            button.GetComponent<Button>().interactable = false;
+            var b = button.GetComponentInChildren<TMP_Text>();
+            b.text = "Waiting for player";
         }
     }
     
@@ -66,10 +128,9 @@ public class ButtonsManager : MonoBehaviourPun
             selectedWords.Add(words[i]);
         }
         GameManager.Instance.photonView.RPC("RPC_RemoveWords",RpcTarget.All,selectedWords.ToArray());
-
     }
 
-    void WaitingButtons()
+    public void WaitingButtons()
     {
         foreach (var button in _buttons)
         {
