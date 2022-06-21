@@ -88,6 +88,9 @@ MonoBehaviour:
   - RPC_SetWordsInServer
   - RPC_SetWaitingButtons
   - RPC_AddPlayerToScore
+  - RPC_ServerLoadScores
+  - RPC_ServerTimeUpdate
+  - RPC_ServerForceTimeStop
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

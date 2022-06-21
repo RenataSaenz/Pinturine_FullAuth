@@ -74,6 +74,8 @@ public class GameManager : MonoBehaviourPun
     {
         _wordSpace.text = "";
         
+        TimeManager.Instance.photonView.RPC("RPC_ServerTimeUpdate", RpcTarget.MasterClient);
+
         if (!Equals(PhotonNetwork.LocalPlayer, clientOwner))
         {
             savedWord = word;
@@ -102,11 +104,17 @@ public class GameManager : MonoBehaviourPun
         if (wordTry != savedWord) return;
         MyServer.Instance.RequestClearDraw(Turn);
         
+        TimeManager.Instance.photonView.RPC("RPC_ServerForceTimeStop", RpcTarget.MasterClient);
+        
         photonView.RPC("RPC_SetScore", RpcTarget.All, plr.NickName);
 
         if (_round == 7 ||_words.Count < 3)
         {
-            photonView.RPC("RPC_GameOver", RpcTarget.All);
+            List<string> orderDataNames = new List<string>();
+            List<int> orderDataScore = new List<int>();
+            orderDataNames = _playersData.OrderByDescending(x => x.TotalScore).Select(x => x.Nickname).ToList();
+            orderDataScore = _playersData.OrderByDescending(x => x.TotalScore).Select(x => x.TotalScore).ToList();
+            HighScoreManager.Instance.photonView.RPC("RPC_ServerLoadScores", RpcTarget.All, orderDataNames.ToArray(), orderDataScore.ToArray());
             return;
         }
         
@@ -117,12 +125,7 @@ public class GameManager : MonoBehaviourPun
 
     }
     
-    [PunRPC]
-    public void RPC_GameOver()
-    {
-       
-        
-    }
+  
     
     [PunRPC]
     public void RPC_SetScore(string playerNickName) //void RPC_SetScore(string[] players)

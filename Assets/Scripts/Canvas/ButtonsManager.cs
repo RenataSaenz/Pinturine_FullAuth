@@ -27,7 +27,6 @@ public class ButtonsManager : MonoBehaviourPun
 
     public void SetButtons()
     {
-       
         photonView.RPC("RPC_SetMenu", RpcTarget.All, GameManager.Instance.Turn,GameManager.Instance.words.ToArray());
     }
 
