@@ -17,6 +17,7 @@ public class MyServer : MonoBehaviourPun
 
     [SerializeField] CharacterFA _characterPrefab;
     [SerializeField] Brush _brushPrefab;
+    [SerializeField] Brush[] _brushes;
 
     Dictionary<Player, CharacterFA> _dictModels = new Dictionary<Player, CharacterFA>();
     Dictionary<Player, List<Brush>> _dictBrushes = new Dictionary<Player, List<Brush>>();
@@ -40,10 +41,7 @@ public class MyServer : MonoBehaviourPun
             }
         }
     }
-    
 
-    
- 
     [PunRPC]
     void SetServer(Player serverPlayer, int sceneIndex = 1)
     {
@@ -109,6 +107,11 @@ public class MyServer : MonoBehaviourPun
     {
         photonView.RPC("RPC_CreateBrush", _server, player,startPos ,endPos);
     }
+
+    public void RequestChangeColor(Player player, string color)
+    {
+        photonView.RPC("RPC_ChangeBrush", _server,player, color);
+    }
     public void RequestDrawAction(Player player,Vector2 actualPos)
     {
         photonView.RPC("RPC_DrawAction", _server, player,actualPos);
@@ -141,6 +144,18 @@ public class MyServer : MonoBehaviourPun
         {
            // PlayerManager.instace.TryWord(nickName, newMsg);
          //   ChatSystem.Instance.SendMessageToChat(nickName,newMsg );
+        }
+    }
+
+    [PunRPC]
+    void RPC_ChangeBrush(Player playerRequested, string newBrush)
+    {
+        if (!Equals(GameManager.Instance.Turn, playerRequested)) return;
+
+        if (_dictModels.ContainsKey(playerRequested))
+        {
+            Brush b = Array.Find(_brushes, brush => brush.name == newBrush);
+            _brushPrefab = b;
         }
     }
 
