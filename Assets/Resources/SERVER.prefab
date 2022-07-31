@@ -68,3 +68,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterPrefab: {fileID: 1071239122629356994, guid: 725001d61ec36a04d89df4d91bf80391, type: 3}
   _brushPrefab: {fileID: 6939725450922524347, guid: a3507498616def94b9c24f80eed26c41, type: 3}
+  _brushes:
+  - {fileID: 6939725450922524347, guid: 31b02ea68dcf8384680d1b458b802bf3, type: 3}
+  - {fileID: 6939725450922524347, guid: 5d0041a79a006a0449a5c9f6801e662e, type: 3}
+  - {fileID: 6939725450922524347, guid: ab214ecbdcf82be44abe44066f1934b1, type: 3}
+  - {fileID: 6939725450922524347, guid: cb2d61af653cc0a44b10a069c13705cb, type: 3}
+  - {fileID: 6939725450922524347, guid: c7fdcdbe4e83bcf4392cd280e464463b, type: 3}
+  - {fileID: 6939725450922524347, guid: 6f3c972a5a61c314eb7bf51b8032b02d, type: 3}
+  - {fileID: 6939725450922524347, guid: a3507498616def94b9c24f80eed26c41, type: 3}
+  - {fileID: 6939725450922524347, guid: c68a3d062f14f7c4da097a5e77de8c65, type: 3}
+  - {fileID: 6939725450922524347, guid: eee95d2b32c685346872165566a61300, type: 3}
+  - {fileID: 6939725450922524347, guid: b4d76818ad2ae644f81f32e4ced7813e, type: 3}

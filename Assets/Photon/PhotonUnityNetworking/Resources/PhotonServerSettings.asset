@@ -27,9 +27,9 @@ MonoBehaviour:
     EnableProtocolFallback: 1
     AuthMode: 0
     EnableLobbyStatistics: 0
-    NetworkLogging: 5
+    NetworkLogging: 0
   DevRegion: sa
-  PunLogging: 2
+  PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
   StartInOfflineMode: 0
@@ -91,6 +91,7 @@ MonoBehaviour:
   - RPC_ServerLoadScores
   - RPC_ServerTimeUpdate
   - RPC_ServerForceTimeStop
+  - RPC_ChangeBrush
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
