@@ -92,6 +92,12 @@ MonoBehaviour:
   - RPC_ServerTimeUpdate
   - RPC_ServerForceTimeStop
   - RPC_ChangeBrush
+  - RPC_ReactionToMistakeFaces
+  - RPC_SetDefeatFaces
+  - RPC_SetDrawingFaces
+  - RPC_SetWinnerFaces
+  - RPC_SetThinkingFaces
+  - RPC_ResetFaces
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
